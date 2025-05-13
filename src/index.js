@@ -13,7 +13,7 @@ async function startServer() {
   app.use(cors)
   
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 3001;
   await new Promise((resolve) => app.listen({ port: PORT }, resolve));
   console.log(
     `🚀 Server ready at http://localhost:${PORT}`
