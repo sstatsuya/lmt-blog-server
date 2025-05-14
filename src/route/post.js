@@ -32,7 +32,6 @@ router.post("/posts", async (req, res) => {
             delete temp.authorID
             return temp
         }))
-        console.log('tien xem data ', data)
         return MyResponse({ res, data: data })
     } catch (error) {
         console.log("ERROR login ", error);
