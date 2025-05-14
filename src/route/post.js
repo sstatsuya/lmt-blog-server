@@ -52,7 +52,19 @@ router.post("/create-post", async (req, res) => {
             authorID: userInfo.id,
         })
         await newPost.save();
-        return MyResponse({ res, data: newPost })
+        const data = {
+            ...newPost.toObject(),
+            author: {
+                id: userInfo.id,
+                avatar: userInfo.avatar,
+                fullname: userInfo.fullname
+            }
+        }
+        delete data.authorID
+        delete data.__v
+        return MyResponse({
+            res, data
+        })
     } catch (error) {
         console.log("ERROR createPost ", error);
         return MyResponse({ res, status: 500, error: error })
