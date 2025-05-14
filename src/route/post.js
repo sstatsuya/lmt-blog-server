@@ -7,6 +7,7 @@ const { MyResponse, getRandomOTP } = require('../common/helper')
 const { OTP_EXPIRED_IN } = require('../common/constant')
 const { uploadKey } = require('../config/uploadKey')
 const Post = require('../model/Post')
+const User = require('../model/User')
 const { GET_USER_INFO, GET_USER_PUBLIC_INFO } = require('../common/api')
 
 router.post("/posts", async (req, res) => {
@@ -17,7 +18,22 @@ router.post("/posts", async (req, res) => {
             throw ''
         }
         const posts = await Post.find({}).skip(offset).limit(pagesize)
-        return MyResponse({ res, data: posts })
+        const data = await Promise.all(posts.map(async (i) => {
+            const userInfo = await User.findOne({ _id: i.authorID })
+            let temp = {
+                ...i.toObject(),
+                author: {
+                    id: userInfo._id,
+                    avatar: userInfo.avatar,
+                    fullname: userInfo.fullname
+                }
+            }
+            delete temp.__v
+            delete temp.authorID
+            return temp
+        }))
+        console.log('tien xem data ', data)
+        return MyResponse({ res, data: data })
     } catch (error) {
         console.log("ERROR login ", error);
         return MyResponse({ res, status: 500, error: error })
@@ -88,11 +104,18 @@ router.get("/view/:id", async (req, res) => {
             })
         })
         const userPublicInfo = await userPublicInfoRes.json();
-        return MyResponse({
-            res, data: {
-                ...post.toObject(),
-                ...userPublicInfo
+        const data = {
+            ...post.toObject(),
+            author: {
+                id: post.authorID,
+                avatar: userPublicInfo.avatar,
+                fullname: userPublicInfo.fullname
             }
+        }
+        delete data.__v
+        delete data.authorID
+        return MyResponse({
+            res, data
         })
     } catch (error) {
         console.log("ERROR view post ", error);

@@ -1,10 +1,6 @@
 const express = require("express"); // import thư viện express đã cài ở trên
 const cors = require('cors');
 
-
-const database = require("./config/database");
-database.connect();
-
 async function startServer() {
   //Start REST
   const app = express();

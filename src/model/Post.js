@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
+const LMTBlogDB = mongoose.createConnection(
+  `mongodb+srv://binpro113wer:Aa123456@cluster0.pc9zh5i.mongodb.net/LMTBlog`
+);
+
 const Post = new Schema(
   {
     _id: { type: String },
@@ -10,4 +15,4 @@ const Post = new Schema(
   },
   { collection: "post" }
 );
-module.exports = mongoose.model("post", Post);
+module.exports = LMTBlogDB.model("post", Post);
