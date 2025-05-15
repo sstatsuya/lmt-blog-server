@@ -9,6 +9,10 @@ const { uploadKey } = require('../config/uploadKey')
 const Post = require('../model/Post')
 const User = require('../model/User')
 const { GET_USER_INFO, GET_USER_PUBLIC_INFO } = require('../common/api')
+const { v2: cloudinary } = require('cloudinary');
+const fs = require('fs/promises');
+const multer = require('multer');
+
 
 router.post("/posts", async (req, res) => {
     try {
@@ -119,6 +123,41 @@ router.get("/view/:id", async (req, res) => {
     } catch (error) {
         console.log("ERROR view post ", error);
         return MyResponse({ res, status: 500, error: error })
+    }
+});
+
+// cấu hình cloudinary
+cloudinary.config({
+    cloud_name: 'dpdzsbphr',
+    api_key: '877622953734342',
+    api_secret: 'gDRYiiSsex-MEcmXGqQixm5Q77c'
+});
+
+
+const upload = multer({ dest: 'uploads/' });
+
+router.post('/upload-image', upload.single('image'), async (req, res) => {
+    try {
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        // upload lên cloudinary
+        const result = await cloudinary.uploader.upload(file.path, {
+            folder: 'tiptap-uploads', // tùy chọn: thư mục chứa trên Cloudinary
+        });
+
+        // xoá file tạm sau khi upload
+        await fs.unlink(file.path);
+
+        return res.json({
+            url: result.secure_url, // URL ảnh bạn có thể gắn vào editor
+        });
+    } catch (error) {
+        console.error('Upload failed:', error);
+        return res.status(500).json({ message: 'Upload failed', error });
     }
 });
 
