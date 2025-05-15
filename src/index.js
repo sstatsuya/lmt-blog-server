@@ -5,7 +5,7 @@ async function startServer() {
   //Start REST
   const app = express();
   app.use(express.json());
-  // fix cors
+  // fix cors nek
   app.use(cors())
   app.use("/", require("./route"));
   
